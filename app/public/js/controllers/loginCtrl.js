@@ -122,6 +122,8 @@ angular.module('compileApp')
 				pub.email = query.email;
 				pub.fname = query.fname;
 				pub.lname = query.lname;
+				pub.data = editor.getValue();
+				pub.language = 'c';
 
 				details = "params="+JSON.stringify(pub);
 				customHttp.request(details, "/api/user/shareCode", "POST", function (str){

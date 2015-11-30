@@ -14,4 +14,4 @@ var CodeShare = new Schema({
 	language: {type: String},
 	date : {type: Date},
 });
-module.exports = mongoose.model('codesphere', CodeSphere);
+module.exports = mongoose.model('codeshare', CodeShare);

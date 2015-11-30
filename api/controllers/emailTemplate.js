@@ -91,7 +91,7 @@ var message = {
     "html": "Please Click on the following link to confirm your email: http://localhost:4000/new/user/email/" + customID,
     "text": "Please Click on the following link to confirm your email: " + customID,
     "subject": "Compile On the Go",
-    "from_email": "grudra7714@gmail.com",
+    "from_email": username,
     "from_name": "Email Confirmation",
     "to": [{
             "email": "grudra7714@gmail.com",
