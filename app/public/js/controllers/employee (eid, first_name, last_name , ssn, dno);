@@ -1,0 +1,27 @@
+employee (eid, first_name, last_name , ssn, dno);
+customer (customerno, customerfirst_name, customerlast_name, phoneno, location);
+department ( dnumber, dname, dlocation, mgr_ssn, mgr_start);
+product (productno, product_name, product_price);
+repair (repairno, customerno, repair_type, repair_status, repair_mgr);
+orders (orderno, date_ordered, customerno, orderstatus, ship_date);
+shipping (shippingno, shipping_company, shipping date, date_ordered);
+warehouse (warehouse_id, warehouse_name, warehouse_adress, warehouse_st, ssn);
+supplier (productno, supid, sup_name, sup_location);
+inventory ( warehouse_id, proudctno, quantity);
+creditcard (customerno, ccid_number, ccno, cc_expiresdate, cc_type)
+training(customerno, eid, session_time, location, session_name);
+
+1. 
+Count the employess  deptno wise where more than 2 employees exist.
+SELECT  d.dnumber, count(e.eid) 
+FROM employee e, department d  
+GROUP BY d.dnumber
+HAVING COUNT(e.eid) > 2
+
+2.
+
+List all customers who have their repair status as completed
+
+select c.customerno 
+from customer c, repair r, orders d
+where c.cus

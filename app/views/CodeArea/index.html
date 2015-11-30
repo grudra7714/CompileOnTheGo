@@ -1,0 +1,95 @@
+<div class="container-fluid">
+    <toast></toast>
+    <div class="row">
+        <div class="col-lg-8" style="height: 800px;">
+			<pre id="editor">
+			</pre>
+	    </div>
+	    <div class="col-lg-4">
+		    <div class="card hovercard">
+		        <div class="card-background">
+		            <img class="card-bkimg" alt="" src="http://lorempixel.com/100/100/people/9/">
+		            <!-- http://lorempixel.com/850/280/people/9/ -->
+		        </div>
+		        <div class="useravatar">
+		            <img alt="" src="">
+		        </div>
+		        <div class="card-info"> <span class="card-title"> {{username}} </span>
+
+		        </div>
+		    </div>
+		    <div class="btn-pref btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
+		        <div class="btn-group" role="group">
+		            <button type="button" id="stars" class="btn btn-primary" href="#tab1" data-toggle="tab"><span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+		                <div class="hidden-xs">Submissions</div>
+		            </button>
+		        </div>
+		        <div class="btn-group" role="group">
+		            <button type="button" id="favorites" class="btn btn-default" href="#tab2" data-toggle="tab"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span>
+		                <div class="hidden-xs">Favorites</div>
+		            </button>
+		        </div>
+		        <div class="btn-group" role="group">
+		            <button type="button" id="following" class="btn btn-default" href="#tab3" data-toggle="tab"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+		                <div class="hidden-xs">Account</div>
+		            </button>
+		        </div>
+		    </div>
+
+		 <div class="well">
+		 
+		      <div class="tab-content">
+		        <div class="tab-pane fade in active" id="tab1">
+		          <h3>This is tab 1</h3>
+		        </div>
+		        <div class="tab-pane fade in" id="tab2">
+		          <h3>This is tab 2</h3>
+		        </div>
+		        <div class="tab-pane fade in" id="tab3">
+		          <h3>This is tab 3</h3>
+		        </div>
+		      </div>
+	    </div>
+
+	    <div class="well">
+        		<a ng-click="run()">
+          			<span class="btn btn-success  btn-arrow-right glyphicon glyphicon-play-circle">  Run</span> &nbsp;
+        		</a>
+        		<a ng-click="codeSave()">
+          			<span class="btn btn-success  btn-arrow-right glyphicon glyphicon-save">  Save</span> &nbsp;
+        		</a>
+        		<a ng-click="public()">
+          			<span class="btn btn-success  btn-arrow-right glyphicon glyphicon-globe">  Share</span> &nbsp;
+        		</a>
+        		<a ng-click="private()">
+          			<span class="btn btn-success btn-arrow-right glyphicon glyphicon-lock">  Private</span> &nbsp;
+        		</a>
+		</div>
+
+	    <div class="well input-group">
+	    	<label for="output"> Output </label>
+	    	<textarea class="form-control custom-control" id="output" rows="4" column="50"/>
+	    	</textarea>
+	    </div>
+    </div>
+</div>
+
+<script>
+/*
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/twilight");
+    editor.session.setMode("ace/mode/c_cpp");
+editor.setOptions({
+  fontSize: "15pt"
+});
+*/
+$(document).ready(function() {
+$(".btn-pref .btn").click(function () {
+    $(".btn-pref .btn").removeClass("btn-primary").addClass("btn-default");
+    // $(".tab").addClass("active"); // instead of this do the below 
+    $(this).removeClass("btn-default").addClass("btn-primary");   
+});
+});
+</script>
+	

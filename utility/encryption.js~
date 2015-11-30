@@ -1,0 +1,19 @@
+var bcrypt=require('bcrypt');
+var config=require('../config/encryption.js');
+
+
+exports.encrypt= function(val,callback){
+
+	bcrypt.genSalt(config['SALT_WORK_FACTOR'],function(err,salt){
+
+		if(err)
+			return callback(err,null);
+
+		bcrypt.hash(val,salt,callback);
+
+	});
+}
+
+exports.compare= function(val,enc,callback){
+	bcrypt.compare(val,enc,callback);
+}
