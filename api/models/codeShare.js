@@ -10,7 +10,7 @@ var CodeShare = new Schema({
 	fname: {type: String},
 	lname: {type: String},
 	iv: {type: String},
-	cipherText: {type: String},
+	filePath: {type: String},
 	language: {type: String},
 	date : {type: Date},
 });

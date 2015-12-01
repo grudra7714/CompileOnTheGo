@@ -236,11 +236,6 @@ exports.shareCode = function (req, res){
 	var param = req.body.params;
 	var obj = JSON.parse(param);
 
-	var query = {};
-	query["id"] = obj.id;
-	query["email"] = obj.email;
-	query["fname"] = obj.fname;
-	query["lname"] = obj.lname;
 
 	var sharedSecret = crypto.randomBytes(16); // should be 128 (or 256) bits
 	var initializationVector = crypto.randomBytes(16); // IV is always 16-bytes
@@ -254,18 +249,34 @@ exports.shareCode = function (req, res){
 	encrypted += cipher.update(plaintext, 'utf8', 'base64');
 	encrypted += cipher.final('base64');
 
-	query['iv'] = initializationVector.toString('base64');
-	query['cipherText'] = encrypted;
-	query['language'] = obj.language;
-	query['date'] = new Date();	
-
-	CodeShare.save(query, function (msg, data){
-		msg = JSON.parse(msg);
-
-		if(msg.status){
-			console.log("Shared message: " + JSON.stringify(msg));
-			res.send("Code Shared");
+	console.log("Going to write into existing file");
+	console.log("Before");
+	var fileName = "app/public/publicCodes/" + obj.id + "_" + Number(new Date()) + ".txt";
+	fs.writeFile(fileName, encrypted,  function(err) {
+		if (err) {
+		   return console.error(err);
 		}
-	})
+		console.log("Data written successfully!");
+		console.log("After");
 
+		var query = {};
+		query["id"] = obj.id;
+		query["email"] = obj.email;
+		query["fname"] = obj.fname;
+		query["lname"] = obj.lname;
+		query['iv'] = initializationVector.toString('base64');
+		query['filePath'] = fileName;
+		query['language'] = obj.language;
+		query['date'] = new Date();	
+
+
+		CodeShare.save(query, function (msg, data){
+			msg = JSON.parse(msg);
+
+			if(msg.status){
+				console.log("Shared message: " + JSON.stringify(msg));
+				res.send("Code Shared");
+			}
+		})
+	});	
 }
