@@ -66,6 +66,7 @@ app.post("/api/user/getData", api.getData);
 app.post("/api/user/addUser", api.addUser);
 app.post("/api/user/shareCode", api.shareCode);
 app.post("/api/user/saveCode", api.codeSave);
+app.post("/api/get/public", api.getPublic);
 app.get("/new/user/email/*", api.confirmUser);
 
 

@@ -40,4 +40,10 @@ compileApp.config(function ($stateProvider, $urlRouterProvider, $locationProvide
 			url: '/new/user/email/:confirmID',
 			ctrl: 'emailCtrl'
 		})
+
+		.state('public', {
+			url: '/codearea/public/:id',
+			templateUrl: '/CodeArea/public.html',
+			controller: 'publicCtrl'
+		})
 })

@@ -21,6 +21,8 @@ var cc 			= require('coupon-code');
 var moment 		=require('moment'); //moment library for timestamping 
 var url			= require('url');
 var request 	= require("request");
+var NodeRSA = require('node-rsa');
+var key = new NodeRSA({b: 512});
 
 //User defined modules
 
@@ -224,9 +226,9 @@ exports.codeSave = function (req, res){
 		console.log("Insid codeSave's save function");
 		msg = JSON.parse(msg);
 		if(msg.status){
-			//data = data[0];
-			//msg.data = data;
+			console.log("Code Saved");
 			console.log(JSON.stringify(msg));
+			res.send(JSON.stringify(msg));
 		}
 	})
 }
@@ -274,9 +276,65 @@ exports.shareCode = function (req, res){
 			msg = JSON.parse(msg);
 
 			if(msg.status){
-				console.log("Shared message: " + JSON.stringify(msg));
-				res.send("Code Shared");
+				var iv_encrypted = key.encrypt(query["iv"], 'base64');
+				//var decrypted = key.decrypt(encrypted, 'utf8');
+				var cursor = User.allEmails;
+				//cursor.skip(0);
+				cursor.stream()
+				.on('data', function (doc){
+					console.log("emails: " + doc['email']);
+
+					email.sendPublicNotification(doc['email'], query["fname"],query["id"], iv_encrypted, function (response){
+						if(response[0].status == 'sent'){
+							console.log("Public email sent");
+						}else{
+							console.log("Unable to send");
+						}
+					})
+
+				})
+				.on('err', function(err){
+					console.log(err);
+				})
+				.on('end', function (){
+					res.send("Done");
+				})
 			}
 		})
 	});	
+}
+
+exports.getPublic = function (req, res){
+	console.log("Inside getPublic function");
+/*	CodeShare.get({}, function(msg, data){
+		msg = JSON.parse(msg);
+		if(msg.status){
+			var len = data.length;	
+			var i = 0;
+			while(i < len){
+				var a = data[i];
+				console.log(a["iv"] + ", " + a["filePath"]);
+				i++;
+			}
+			console.log("len: " + len);
+
+
+
+			//console.log(JSON.stringify(data));
+		}
+*/
+			var cursor = CodeShare.allCodes;
+			//cursor.skip(0);
+			cursor.stream()
+			.on('data', function (doc){
+				console.log("iv: " + doc['iv'] + "filePath: " + doc['filePath']);
+
+			})
+			.on('err', function(err){
+				console.log(err);
+			})
+			.on('end', function (){
+				res.send("Done");
+			})
+	})	
 }

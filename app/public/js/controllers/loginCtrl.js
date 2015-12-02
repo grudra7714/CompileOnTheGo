@@ -106,6 +106,7 @@ angular.module('compileApp')
 
 				details = "params="+JSON.stringify(params);
 				customHttp.request(details, "/api/user/saveCode", "POST", function (str){
+					console.log(str);
 					ngToast.create({
 					  className: 'success',
 					  content: 'Code Saved',
@@ -126,7 +127,9 @@ angular.module('compileApp')
 				pub.language = 'c';
 
 				details = "params="+JSON.stringify(pub);
+
 				customHttp.request(details, "/api/user/shareCode", "POST", function (str){
+					console.log(str);
 					ngToast.create({
 					  className: 'success',
 					  content: 'Code Shared. Check out shared public page',
@@ -134,4 +137,25 @@ angular.module('compileApp')
 					});
 				})
 			}
+
+			$scope.publicPage = function (){
+				console.log("/codearea/public/"+$stateparams.id);
+				$location.path("/codearea/public/"+$stateparams.id);
+			}
+}])
+
+.controller("publicCtrl", ['$stateParams', '$scope', '$location', 'customHttp', 'ngToast', function($stateparams, $scope, $location, customHttp, ngToast){
+	var query = "";
+	customHttp.request(query, "/api/get/public", "POST", function(str){
+
+	})
+
+	$scope.data = [{'name': 'abc', 'fileName':'abc', 'language':'abc', 'date':'abc'},{'name': 'abc', 'fileName':'abc', 'language':'abc', 'date':'abc'},
+	{'name': 'abc', 'fileName':'abc', 'language':'abc', 'date':'abc'}];
+
+
+
+	$scope.codeid = "collapse1";
+	console.log("Inside profileCtrl");
+
 }])

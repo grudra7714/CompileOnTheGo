@@ -184,3 +184,5 @@ exports.remove = function(id,callback)
 	
 	});
 };
+
+exports.allEmails = User.find({},{email: true});

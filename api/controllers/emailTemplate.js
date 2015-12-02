@@ -1,5 +1,6 @@
 var mandrill = require('mandrill-api/mandrill');
 var User = require("../models/emailConfirmation.js");
+var list = require("./users.js")
 var genRes = require('./genres.js');
 var _=require('lodash');
 
@@ -91,16 +92,13 @@ var message = {
     "html": "Please Click on the following link to confirm your email: http://localhost:4000/new/user/email/" + customID,
     "text": "Please Click on the following link to confirm your email: " + customID,
     "subject": "Compile On the Go",
-    "from_email": username,
+    "from_email": "grudra7714@gmail.com",
     "from_name": "Email Confirmation",
     "to": [{
-            "email": "grudra7714@gmail.com",
+            "email": username,
             "name": name,
             "type": "to"
         }],
-    "headers": {
-        "Reply-To": "grudra7714@gmail.com"
-    },
     "important": false,
     "track_opens": null,
     "track_clicks": null,
@@ -117,8 +115,6 @@ var message = {
     "merge_language": "mailchimp"
 };
 var async = false;
-var ip_pool = "Main Pool";
-var send_at = "example send_at";
 mandrill_client.messages.send({"message": message, "async": async}, function(result) {
     console.log(result);
     callback(result);
@@ -136,4 +132,60 @@ mandrill_client.messages.send({"message": message, "async": async}, function(res
     console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
     // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
 });
+}
+
+exports.sendPublicNotification = function ( username, fname, id, key , callback){
+
+        console.log("" + username  + " " + key);
+        mandrill_client = new mandrill.Mandrill('V0chXZeXBAaLZ_MgocxynA');
+    var message = {
+        "html": fname + " has publicly shared a code. To view shared code please click on the following link : http://localhost:4000/view/public/email/"
+         + id + "/"+ key,
+        //"text": "Please Click on the following link to confirm your email: " + customID,
+        "subject": "Compile On the Go",
+        "from_email": username,
+        "from_name": "no-reply",
+        "to": [{
+                "email": username,
+                "name": fname,
+                "type": "to"
+            }],
+        "headers": {
+            "Reply-To": "grudra7714@gmail.com"
+        },
+        "important": false,
+        "track_opens": null,
+        "track_clicks": null,
+        "auto_text": null,
+        "auto_html": null,
+        "inline_css": null,
+        "url_strip_qs": null,
+        "preserve_recipients": null,
+        "view_content_link": null,
+        "tracking_domain": null,
+        "signing_domain": null,
+        "return_path_domain": null,
+        "merge": true,
+        "merge_language": "mailchimp"
+    };
+    var async = false;
+    var ip_pool = "Main Pool";
+    var send_at = "example send_at";
+    mandrill_client.messages.send({"message": message, "async": async}, function(result) {
+        console.log(result);
+        callback(result);
+        /*  
+        [{
+                "email": "recipient.email@example.com",
+                "status": "sent",
+                "reject_reason": "hard-bounce",
+                "_id": "abc123abc123abc123abc123abc123"
+            }]
+        */
+    }, function(e) {
+        // Mandrill returns the error as an object with name and message keys
+
+        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+        // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+    });
 }

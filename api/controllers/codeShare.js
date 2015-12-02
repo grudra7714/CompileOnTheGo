@@ -31,3 +31,28 @@ exports.save = function(params,callback){
 
         });
 };
+
+exports.get = function(params,callback){
+        console.log("Params: " + params);
+
+        User.find(params).exec(function (err,user){
+            if( !(_.isNull(err)) )
+            {
+                var response_string=genRes.generateResponse(false,"There Occured Some Error : "+err.err);
+                callback(response_string,null);
+            }
+            else
+            {
+                if(user.length!=0)
+                {
+                    var response_string=genRes.generateResponse(true,"User Found : ");
+                    callback(response_string,user);
+                }
+                else
+                {
+                    var response_string=genRes.generateResponse(false,"No User Found");
+                    callback(response_string,null);
+                }
+            }
+        });
+};
