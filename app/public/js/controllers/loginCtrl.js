@@ -73,7 +73,7 @@ angular.module('compileApp')
 	console.log("Confirm ID: " + $stateparams.confirmID);
 }])
 
-.controller("profileCtrl", ['$stateParams', '$scope', '$location', 'customHttp', 'ngToast', function($stateparams, $scope, $location, customHttp, ngToast){
+.controller("profileCtrl", ['$stateParams', '$scope', '$location', '$base64','customHttp', 'ngToast', function($stateparams, $scope, $location, $base64, customHttp, ngToast){
 	//console.log("Confirm ID: " + $stateparams.confirmID);
 
 		var editor = ace.edit("editor");
@@ -101,7 +101,8 @@ angular.module('compileApp')
 
 				params = {};
 				params._id = $stateparams.id;
-				params.data = code;
+				params.data = $base64.encode(code);
+				console.log(params.data);
 				params.language = 'c';
 
 				details = "params="+JSON.stringify(params);
@@ -123,7 +124,8 @@ angular.module('compileApp')
 				pub.email = query.email;
 				pub.fname = query.fname;
 				pub.lname = query.lname;
-				pub.data = editor.getValue();
+				pub.data = $base64.encode(editor.getValue());
+				console.log(pub.data);
 				pub.language = 'c';
 
 				details = "params="+JSON.stringify(pub);
@@ -147,7 +149,7 @@ angular.module('compileApp')
 .controller("publicCtrl", ['$stateParams', '$scope', '$location', 'customHttp', 'ngToast', function($stateparams, $scope, $location, customHttp, ngToast){
 	var query = "";
 	customHttp.request(query, "/api/get/public", "POST", function(str){
-
+		console.log(JSON.stringify(str));
 	})
 
 	$scope.data = [{'name': 'abc', 'fileName':'abc', 'language':'abc', 'date':'abc'},{'name': 'abc', 'fileName':'abc', 'language':'abc', 'date':'abc'},

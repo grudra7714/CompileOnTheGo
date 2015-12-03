@@ -1,6 +1,6 @@
 'use strict'	;
 
-var compileApp = angular.module('compileApp', ['ui.router', 'ngToast']);
+var compileApp = angular.module('compileApp', ['ui.router', 'ngToast', 'base64']);
 
   compileApp.config(['ngToastProvider', function(ngToast) {
     ngToast.configure({

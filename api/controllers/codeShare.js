@@ -56,3 +56,5 @@ exports.get = function(params,callback){
             }
         });
 };
+
+exports.allCodes = User.find({});

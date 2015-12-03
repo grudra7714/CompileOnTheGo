@@ -12,6 +12,7 @@ var CodeShare = require('./controllers/codeShare.js')
 //required librabries
 
 var _ 			= require('lodash');
+var async		= require('async');
 var fs 			= require('fs');
 var path 		= require('path');
 var crypto 		= require('crypto');
@@ -23,6 +24,8 @@ var url			= require('url');
 var request 	= require("request");
 var NodeRSA = require('node-rsa');
 var key = new NodeRSA({b: 512});
+var JSONStream = require('json-stream');var fileContent = '';
+var prettyjson = require('prettyjson');
 
 //User defined modules
 
@@ -32,6 +35,17 @@ mongoose.connect(database.url);
 
 mongoose.connection.on('error', console.error.bind(console, 'connection error:')); // Error handler
 var db = mongoose.connection;
+
+ // ---------------- MONGODB SPECIFICALLY FOR SENDING DATA TO ANGUALRJS -------------- 
+var mongodb = require('mongodb');
+
+//We need to work with "MongoClient" interface in order to connect to a mongodb server.
+var MongoClient = mongodb.MongoClient;
+
+// Connection URL. This is where your mongodb server is running.
+var url = 'mongodb://localhost:27017/compiler';
+
+// Use connect method to connect to the Server
 
 
 exports.index = function (req, res) {
@@ -215,6 +229,7 @@ exports.codeSave = function (req, res){
 
 	query['id'] = obj._id;
 	query['iv'] = initializationVector.toString('base64');
+	query['sharedSecret'] = sharedSecret;
 	query['cipherText'] = encrypted;
 	query['language'] = obj.language;
 	query['date'] = new Date();	
@@ -233,6 +248,17 @@ exports.codeSave = function (req, res){
 	})
 }
 
+function setData(inside){
+	console.log("Inside setData");
+	fileContent = inside;
+}
+
+function getData(){
+	console.log("Inside getData");
+	return fileContent;
+}
+
+
 exports.shareCode = function (req, res){
 	console.log("Inside Sharecode");
 	var param = req.body.params;
@@ -240,20 +266,23 @@ exports.shareCode = function (req, res){
 
 
 	var sharedSecret = crypto.randomBytes(16); // should be 128 (or 256) bits
+
+	console.log("sharedSecret: " + sharedSecret);
 	var initializationVector = crypto.randomBytes(16); // IV is always 16-bytes
 
-	var plaintext = obj.data;
+	var plaintext = new Buffer(obj.data, 'base64');
 	var encrypted;
 
 	var cipher;
 
-	cipher = crypto.Cipheriv('aes-128-cbc', sharedSecret, initializationVector);
+	cipher = crypto.createCipheriv('aes-128-cbc', sharedSecret, initializationVector);
 	encrypted += cipher.update(plaintext, 'utf8', 'base64');
 	encrypted += cipher.final('base64');
 
 	console.log("Going to write into existing file");
 	console.log("Before");
-	var fileName = "app/public/publicCodes/" + obj.id + "_" + Number(new Date()) + ".txt";
+	var t = Number(new Date())
+	var fileName = "app/public/publicCodes/" + obj.id + "_" + t +"_c" + ".txt";
 	fs.writeFile(fileName, encrypted,  function(err) {
 		if (err) {
 		   return console.error(err);
@@ -267,6 +296,7 @@ exports.shareCode = function (req, res){
 		query["fname"] = obj.fname;
 		query["lname"] = obj.lname;
 		query['iv'] = initializationVector.toString('base64');
+		query['sharedSecret'] = sharedSecret.toString('base64');
 		query['filePath'] = fileName;
 		query['language'] = obj.language;
 		query['date'] = new Date();	
@@ -297,7 +327,20 @@ exports.shareCode = function (req, res){
 					console.log(err);
 				})
 				.on('end', function (){
+					insertAgain();
 					res.send("Done");
+				})
+			}
+			function insertAgain(){
+				console.log("Inside insertAgain()");
+				console.log("before");
+				var fileName = "app/public/js/files/" + obj.id + "_" + t  +"_c" + ".txt";
+				fs.writeFile(fileName, plaintext,  function(err) {
+					if (err) {
+					   return console.error(err);
+					}
+					console.log("Data written successfully in another file!");
+					console.log("After this");
 				})
 			}
 		})
@@ -305,36 +348,109 @@ exports.shareCode = function (req, res){
 }
 
 exports.getPublic = function (req, res){
-	console.log("Inside getPublic function");
-/*	CodeShare.get({}, function(msg, data){
-		msg = JSON.parse(msg);
-		if(msg.status){
-			var len = data.length;	
-			var i = 0;
-			while(i < len){
-				var a = data[i];
-				console.log(a["iv"] + ", " + a["filePath"]);
-				i++;
-			}
-			console.log("len: " + len);
-
-
-
-			//console.log(JSON.stringify(data));
-		}
-*/
+			console.log("Inside getPublic function");
 			var cursor = CodeShare.allCodes;
+			var prg = [];
 			//cursor.skip(0);
-			cursor.stream()
-			.on('data', function (doc){
-				console.log("iv: " + doc['iv'] + "filePath: " + doc['filePath']);
+			var i = 0;
+			var inside ="";
+			var flag = 1;
+			MongoClient.connect(url, function (err, db) {
+			  if (err) {
+			    console.log('Unable to connect to the mongoDB server. Error:', err);
+			  } else {
+			    //HURRAY!! We are connected. :)
+			    console.log('Connection established to', url);
 
-			})
-			.on('err', function(err){
-				console.log(err);
-			})
-			.on('end', function (){
-				res.send("Done");
-			})
-	})	
+			    // do some work here with the database.
+			    var cursor = db.collection('codeshares').find();
+			    //var count = cursor.count();
+
+			    //console.log("count: " + JSON.stringify(count));
+			    var temp = 0;
+
+				cursor.count({}, function(error, num){
+					console.log("num: " + num);
+					var final_inside  = {};
+
+					cursorForEach();
+
+					function cursorForEach(){
+						var flag = 0;
+						cursor.forEach( function (doc){
+		
+
+								console.log("iv: " + doc['iv'] + "filePath: " + doc['filePath'] + "sharedSecret: " + doc['sharedSecret']);
+								var iv = doc['iv'];
+								var sharedSecret = doc['sharedSecret'];
+								var filePath = doc['filePath'];
+								filePath = filePath.substr(filePath.lastIndexOf("/"));
+								var newFilePath = "app/public/js/files";
+								newFilePath += filePath;
+
+								var decrypted;
+
+								var cipher;
+								var content;
+
+								fs.readFile(newFilePath, function read(err, data){
+									if(err)
+										throw err;
+
+									temp++;
+									console.log(temp);
+
+									function processFile(){
+										var initializationVector = new Buffer(iv, 'base64');
+										var SharedSecret = new Buffer(sharedSecret, 'base64');
+										cipher = crypto.createDecipheriv('aes-128-cbc', SharedSecret, initializationVector);
+										decrypted += cipher.update(content, 'base64', 'utf8');
+										decrypted += cipher.final('utf8');
+
+										console.log(decrypted);
+									}
+
+
+										content = data;
+										if(temp == 1)
+											inside += ",{\"name\":\"" + doc['fname'] + "" + doc['lname']+ "\"}";
+										else
+											inside += "{\"name\":\"" + doc['fname'] + "" + doc['lname']+ "\"}";
+
+										inside += ",{\"fileName\":\"" + filePath + "\"}";
+										inside += ",{\"language\":\"c\"}";
+										inside += ",{\"date\":\"" + doc['date'] + "\"}";
+										inside += ",{\"content\":\"" + content.toString("base64") + "\"},";
+
+
+										if(temp == num){
+											console.log("Now");
+											temp++;
+											flag = 1;
+										    if (inside.substr(0,1) == ",") {
+										        inside = inside.substring(1);
+										    }
+										    var len = inside.length;
+										    if (inside.substr(len-1,1) == ",") {
+										        inside = inside.substring(0,len-1);
+										    }
+
+											final_inside = "[" + inside + "]";
+											final_inside = JSON.parse(final_inside);
+											console.log(prettyjson.render(final_inside, {noColor: false}));
+											res.send(JSON.stringify(final_inside));
+											//console.log(prettyjson.render(final_inside, {noColor: false}));
+										}
+									})
+								})// FOR EACH LOOP
+								
+							if(flag == 1){
+								console.log("When ?");
+							}
+						}
+					});// count
+
+			}// ELSE BLOCK
+		});
 }
+
