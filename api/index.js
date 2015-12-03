@@ -413,14 +413,14 @@ exports.getPublic = function (req, res){
 
 										content = data;
 										if(temp == 1)
-											inside += ",{\"name\":\"" + doc['fname'] + "" + doc['lname']+ "\"}";
+											inside += ",{\"name\":\"" + doc['fname'] + "" + doc['lname']+ "\"";
 										else
-											inside += "{\"name\":\"" + doc['fname'] + "" + doc['lname']+ "\"}";
+											inside += "{\"name\":\"" + doc['fname'] + "" + doc['lname']+ "\"";
 
-										inside += ",{\"fileName\":\"" + filePath + "\"}";
-										inside += ",{\"language\":\"c\"}";
-										inside += ",{\"date\":\"" + doc['date'] + "\"}";
-										inside += ",{\"content\":\"" + content.toString("base64") + "\"},";
+										inside += ",\"fileName\":\"" + filePath.substr(1, filePath.length - 5) + "\"";
+										inside += ",\"language\":\"c\"";
+										inside += ",\"date\":\"" + doc['date'] + "\"";
+										inside += ",\"content\":\"" + content.toString("base64") + "\"},";
 
 
 										if(temp == num){

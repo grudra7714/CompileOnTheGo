@@ -1,36 +1,84 @@
-<div class="container">
-        <h2>Panels with Pagination</h2>
-    <hr>
-
-    <div class="col-sm-12">
-        <div class="panel-group ng-scope" id="accordion" ng-repeat="x in data">
-            <div class="panel panel-default" style="display: block;">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#{{codeid}}">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-sm-3"> {{x.name}} </div>
-                                <div class="col-sm-3"> {{x.fileName}} </div>
-                                <div class="col-sm-3"> Language {{x.language}} </div>
-                                <div class="col-sm-3"> {{x.date}} <span class="label-info pull-right">View <i class="fa fa-angle-double-down"></i></span></div>
+<div class="container-fluid">
+        <h2>Public Repository</h2>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="panel-group ng-scope" id="accordion" ng-repeat="x in data">
+                <div class="panel panel-default" style="display: block;">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#{{x.fileName}}">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-sm-2"> {{x.name}} </div>
+                                    <div class="col-sm-3 text-left" > {{x.fileName }} </div>
+                                    <div class="col-sm-2 text-right">  {{x.language}} </div>
+                                    <div class="col-sm-5 text-center"> {{x.date}} </div>
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </h4>
-                </div>
-                <div id="{{codeid}}" class="panel-collapse collapse">
-                    <div class="">
-                        <pre>
-                            <code id="placeCode" class="language-c"> </code>
-                        </pre>
+                        </a>
+                    </h4>
                     </div>
+                    <div id="{{x.fileName}}" class="panel-collapse collapse" ng-click="decrypt()">
+                        <div class="">
+                            <pre>
+                                <code id="placeCode" ng-model="placeCode" class="language-c"> {{x.content}}</code>
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-12 text-center">
+                <ul id="myPager" class="pagination"></ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card hovercard">
+                <div class="card-background">
+                    <img class="card-bkimg" alt="" src="http://lorempixel.com/100/100/people/9/">
+                    <!-- http://lorempixel.com/850/280/people/9/ -->
+                </div>
+                <div class="useravatar">
+                    <img alt="" src="">
+                </div>
+                <div class="card-info"> <span class="card-title"> {{username}} </span>
+
+                </div>
+            </div>
+            <div class="btn-pref btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
+                <div class="btn-group" role="group">
+                    <button type="button" id="stars" class="btn btn-primary" href="#tab1" data-toggle="tab"><span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                        <div class="hidden-xs">Submissions</div>
+                    </button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" id="favorites" class="btn btn-default" href="#tab2" data-toggle="tab"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span>
+                        <div class="hidden-xs">Favorites</div>
+                    </button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" id="following" class="btn btn-default" href="#tab3" data-toggle="tab"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                        <div class="hidden-xs">Account</div>
+                    </button>
                 </div>
             </div>
 
+         <div class="well">
+         
+              <div class="tab-content">
+                <div class="tab-pane fade in active" id="tab1">
+                  <h3>This is tab 1</h3>
+                </div>
+                <div class="tab-pane fade in" id="tab2">
+                  <h3>This is tab 2</h3>
+                </div>
+                <div class="tab-pane fade in" id="tab3">
+                  <h3>This is tab 3</h3>
+                </div>
+              </div>
         </div>
-        <div class="col-md-12 text-center">
-            <ul id="myPager" class="pagination"></ul>
+
+
         </div>
     </div>
 </div>
@@ -41,7 +89,7 @@
 $.fn.pageMe = function(opts){
     var $this = this,
         defaults = {
-            perPage: 7,
+            perPage: 2,
             showPrevNext: false,
             numbersPerPage: 1,
             hidePageNumbers: false

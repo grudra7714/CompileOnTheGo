@@ -146,18 +146,21 @@ angular.module('compileApp')
 			}
 }])
 
-.controller("publicCtrl", ['$stateParams', '$scope', '$location', 'customHttp', 'ngToast', function($stateparams, $scope, $location, customHttp, ngToast){
+.controller("publicCtrl", ['$stateParams', '$scope', '$location', '$base64','customHttp', 'ngToast', function($stateparams, $scope, $location, $base64, customHttp, ngToast){
 	var query = "";
+
 	customHttp.request(query, "/api/get/public", "POST", function(str){
+/*		console.log("length: " + str.length);
 		console.log(JSON.stringify(str));
+*/		var i = 0;
+		while(i< str.length){
+			var a = str[i];
+			a['content'] = $base64.decode(a['content']);
+			//console.log(a['content']);
+			str[i] = a;
+			i++;
+		}
+		$scope.data = str;
 	})
-
-	$scope.data = [{'name': 'abc', 'fileName':'abc', 'language':'abc', 'date':'abc'},{'name': 'abc', 'fileName':'abc', 'language':'abc', 'date':'abc'},
-	{'name': 'abc', 'fileName':'abc', 'language':'abc', 'date':'abc'}];
-
-
-
-	$scope.codeid = "collapse1";
 	console.log("Inside profileCtrl");
-
 }])
