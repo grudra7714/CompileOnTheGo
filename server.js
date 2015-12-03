@@ -3,7 +3,7 @@
 var express = require('express');
 var app = express();
 var router = express.Router();
-var port = process.env.PORT || 4000;
+var port = process.env.PORT || 5000;
 
 //MIDDLEWARES
 
@@ -68,7 +68,9 @@ app.post("/api/user/shareCode", api.shareCode);
 app.post("/api/user/saveCode", api.codeSave);
 app.post("/api/get/public", api.getPublic);
 app.get("/new/user/email/*", api.confirmUser);
-
+app.get("/codearea/public/*", api.sendPublic);
+app.get("/codearea/new/*", api.sendNew);
+app.post("/api/run/code", api.runCode);
 
 /// error handlers
  //

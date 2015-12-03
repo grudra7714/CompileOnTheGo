@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid" ng-init="init()">
     <toast></toast>
     <div class="row">
         <div class="col-lg-8" style="height: 800px;">
@@ -40,13 +40,13 @@
 		 
 		      <div class="tab-content">
 		        <div class="tab-pane fade in active" id="tab1">
-		          <h3>This is tab 1</h3>
+		          <h3>Submissions</h3>
 		        </div>
 		        <div class="tab-pane fade in" id="tab2">
-		          <h3>This is tab 2</h3>
+		          <h3>Favorites</h3>
 		        </div>
 		        <div class="tab-pane fade in" id="tab3">
-		          <h3>This is tab 3</h3>
+		          <h3>Account</h3>
 		        </div>
 		      </div>
 	    </div>
@@ -59,10 +59,10 @@
         		<a ng-click="codeSave()">
           			<span class="btn btn-success  btn-arrow-right glyphicon glyphicon-save">  Save</span> &nbsp;
         		</a>
-        		<a ng-click="public()">
-          			<span class="btn btn-success  btn-arrow-right glyphicon glyphicon-globe">  Share</span> &nbsp;
+        		<a ng-click="public()" id="share">
+          			<span id="sh" class="btn btn-success btn-disabled btn-arrow-right glyphicon glyphicon-globe">  Share</span> &nbsp;
         		</a>
-        		<a ng-click="private()">
+        		<a>
           			<span class="btn btn-success btn-arrow-right glyphicon glyphicon-lock">  Private</span> &nbsp;
         		</a>
         	</center>
@@ -75,7 +75,15 @@
         		</a>
         	</center>
 		</div>			
-
+    	
+    	<div class="well input-group">
+	    	<label for="input"> With Input </label>
+				<div class="radio">
+				  <label><input type="checkbox" name="optradio" class='situation' ng-click="chck()" id="yes">Yes</label>
+					<textarea id="txtarea" name="text"></textarea>
+				</div>
+	    </div>
+    
 	    <div class="well input-group">
 	    	<label for="output"> Output </label>
 	    	<textarea class="form-control custom-control" id="output" rows="4" column="50"/>
@@ -100,6 +108,21 @@ $(".btn-pref .btn").click(function () {
     // $(".tab").addClass("active"); // instead of this do the below 
     $(this).removeClass("btn-default").addClass("btn-primary");   
 });
+
+$("#share").click(function(){
+//	alert("here");
+	$('#sh').addClass('btn-disabled');
 });
-</script>
+
+
+});
+
+$("#txtarea").hide(); // or you can have hidden w/ CSS
+    $(".situation").click(function(){
+        $("#txtarea").toggle();
+    });
+/*    $("#no").click(function(){
+    	$("#txtarea").toggle();
+    });
+*/</script>
 	

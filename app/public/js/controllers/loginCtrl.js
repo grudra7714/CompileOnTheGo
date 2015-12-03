@@ -73,8 +73,25 @@ angular.module('compileApp')
 	console.log("Confirm ID: " + $stateparams.confirmID);
 }])
 
-.controller("profileCtrl", ['$stateParams', '$scope', '$location', '$base64','customHttp', 'ngToast', function($stateparams, $scope, $location, $base64, customHttp, ngToast){
+.controller("profileCtrl", ['$stateParams', '$scope', '$location', '$base64', '$sce','customHttp', 'ngToast', function($stateparams, $scope, $location, $base64, $sce, customHttp, ngToast){
 	//console.log("Confirm ID: " + $stateparams.confirmID);
+
+		var fileName = "noname";
+		var f = 0;
+		$scope.init = function(){
+
+			ngToast.create({
+			  className: 'success',
+			  content: $sce.trustAsHtml("File Name &nbsp; &nbsp;<input type='text' id='fileName' /> <input type='button' id='fnm' ng-click='getFileName()' value='Save' />"),
+			  horizontalPosition: 'center',
+			  dismissButton: true,
+			  compileContent: true,
+			  dismissOnClick: false,
+			  timeout: 40000
+			});
+
+		}
+		
 
 		var editor = ace.edit("editor");
 		editor.setTheme("ace/theme/twilight");
@@ -82,6 +99,8 @@ angular.module('compileApp')
 		editor.setOptions({
 			fontSize: "15pt"
 		});
+
+
 
 		var params = {};
 		params._id = $stateparams.id;
@@ -102,6 +121,7 @@ angular.module('compileApp')
 				params = {};
 				params._id = $stateparams.id;
 				params.data = $base64.encode(code);
+				params.fileName = fileName;
 				console.log(params.data);
 				params.language = 'c';
 
@@ -117,6 +137,11 @@ angular.module('compileApp')
 					//console.log(editor.getValue());
 			}
 
+			$scope.getFileName = function(){
+				fileName = $("#fileName").val();
+				console.log(fileName);
+			}
+
 			$scope.public = function(){
 				console.log("Inside public function");
 				var pub = {}
@@ -124,6 +149,7 @@ angular.module('compileApp')
 				pub.email = query.email;
 				pub.fname = query.fname;
 				pub.lname = query.lname;
+				pub.fileName = fileName;
 				pub.data = $base64.encode(editor.getValue());
 				console.log(pub.data);
 				pub.language = 'c';
@@ -144,6 +170,35 @@ angular.module('compileApp')
 				console.log("/codearea/public/"+$stateparams.id);
 				$location.path("/codearea/public/"+$stateparams.id);
 			}
+
+			$scope.run = function (){
+				console.log("Inside run function");
+				var pub = {};
+				pub.data = $base64.encode(editor.getValue());
+				console.log(pub.data);
+				pub.language = 'c';
+				pub.flag = f;
+				pub.values = $("#txtarea").val();
+
+				details = "params="+JSON.stringify(pub);
+
+				customHttp.request(details, "/api/run/code", "POST", function (str){
+					console.log(str);
+					$("#output").val(str.output);
+					ngToast.create({
+					  className: 'success',
+					  content: 'Code Compiled',
+					  horizontalPosition: 'center'
+					});
+				})
+
+
+			}
+
+			$scope.chck = function(){
+				f = 1;
+			}
+
 }])
 
 .controller("publicCtrl", ['$stateParams', '$scope', '$location', '$base64','customHttp', 'ngToast', function($stateparams, $scope, $location, $base64, customHttp, ngToast){

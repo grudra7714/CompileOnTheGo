@@ -7,7 +7,8 @@ var CodeSphere = new Schema({
 
 	id: {type: String},
 	iv: {type: String},
-	cipherText: {type: String},
+	filePath: {type: String},
+	savedName: {type: String},
 	language: {type: String},
 	date : {type: Date},
 	sharing: {type: Boolean, default: true}

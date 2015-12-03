@@ -6,7 +6,8 @@ var compileApp = angular.module('compileApp', ['ui.router', 'ngToast', 'base64']
     ngToast.configure({
       verticalPosition: 'top',
       horizontalPosition: 'center',
-      maxNumber: 3
+      maxNumber: 3,
+      animation: 'slide'
     });
   }]);
 

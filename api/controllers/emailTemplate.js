@@ -89,7 +89,7 @@ exports.sendEmail = function(username, name, customID, callback){
     console.log("" + username  + " " + name + " " + customID);
     mandrill_client = new mandrill.Mandrill('V0chXZeXBAaLZ_MgocxynA');
 var message = {
-    "html": "Please Click on the following link to confirm your email: http://localhost:4000/new/user/email/" + customID,
+    "html": "Please Click on the following link to confirm your email: http://localhost:5000/new/user/email/" + customID,
     "text": "Please Click on the following link to confirm your email: " + customID,
     "subject": "Compile On the Go",
     "from_email": "grudra7714@gmail.com",
@@ -139,7 +139,7 @@ exports.sendPublicNotification = function ( username, fname, id, key , callback)
         console.log("" + username  + " " + key);
         mandrill_client = new mandrill.Mandrill('V0chXZeXBAaLZ_MgocxynA');
     var message = {
-        "html": fname + " has publicly shared a code. To view shared code please click on the following link : http://localhost:4000/view/public/email/"
+        "html": fname + " has publicly shared a code. To view shared code please click on the following link : http://localhost:5000/view/public/email/"
          + id + "/"+ key,
         //"text": "Please Click on the following link to confirm your email: " + customID,
         "subject": "Compile On the Go",

@@ -19,6 +19,10 @@ var crypto 		= require('crypto');
 var mongoose 	= require('mongoose');
 var ObjectId 	= require('mongoose').Types.ObjectId;
 var cc 			= require('coupon-code');
+var compiler 	= require('compilex');
+var options = {stats : true}; //prints stats on console  
+compiler.init(options);
+
 var moment 		=require('moment'); //moment library for timestamping 
 var url			= require('url');
 var request 	= require("request");
@@ -162,6 +166,17 @@ exports.getData = function (req, res){
 	})
 }
 
+exports.sendPublic = function (req, res){
+	console.log(req.url);
+	res.redirect(req.url);
+}
+
+
+exports.sendNew = function (req, res){
+	console.log(req.url);
+	res.redirect(req.url);
+}
+
 exports.confirmUser = function (req, res){
 	console.log("Confirm User");
 	console.log("url: " + req.url);
@@ -217,7 +232,7 @@ exports.codeSave = function (req, res){
 	var sharedSecret = crypto.randomBytes(16); // should be 128 (or 256) bits
 	var initializationVector = crypto.randomBytes(16); // IV is always 16-bytes
 
-	var plaintext = obj.data;
+	var plaintext = new Buffer(obj.data, 'base64');
 	var encrypted;
 
 	var cipher;
@@ -236,27 +251,55 @@ exports.codeSave = function (req, res){
 
 	console.log(JSON.stringify(query));
 
-	CodeSphere.save(query, function(msg, data){
 
-		console.log("Insid codeSave's save function");
-		msg = JSON.parse(msg);
-		if(msg.status){
-			console.log("Code Saved");
-			console.log(JSON.stringify(msg));
-			res.send(JSON.stringify(msg));
+	var t = Number(new Date())
+	var fileName = "app/public/publicCodes/" + obj.fileName + "_" + t +"_c" + ".txt";
+	fs.writeFile(fileName, encrypted,  function(err) {
+		if (err) {
+		   return console.error(err);
 		}
+		console.log("Data written successfully!");
+		console.log("After");
+
+		query = {};
+		query['id'] = obj._id;
+		query['iv'] = initializationVector.toString('base64');
+		query['sharedSecret'] = sharedSecret;
+		query['filePath'] = fileName;
+		query['savedName'] = obj.fileName;
+		query['language'] = obj.language;
+		query['date'] = new Date();	
+
+		CodeSphere.save(query, function(msg, data){
+
+			console.log("Insid codeSave's save function");
+			msg = JSON.parse(msg);
+			if(msg.status){
+				console.log("Code Saved");
+				console.log(JSON.stringify(msg));
+				insertAgain();
+				res.send(JSON.stringify(msg));
+			}
+		})
+
+			function insertAgain(){
+				console.log("Inside insertAgain()");
+				console.log("before");
+				var fileName = "app/public/js/files/" + obj.fileName + "_" + t  +"_c" + ".txt";
+				fs.writeFile(fileName, plaintext,  function(err) {
+					if (err) {
+					   return console.error(err);
+					}
+					console.log("Data written successfully in another file!");
+					console.log("After this");
+				})
+			}
+
+
 	})
 }
 
-function setData(inside){
-	console.log("Inside setData");
-	fileContent = inside;
-}
 
-function getData(){
-	console.log("Inside getData");
-	return fileContent;
-}
 
 
 exports.shareCode = function (req, res){
@@ -282,7 +325,7 @@ exports.shareCode = function (req, res){
 	console.log("Going to write into existing file");
 	console.log("Before");
 	var t = Number(new Date())
-	var fileName = "app/public/publicCodes/" + obj.id + "_" + t +"_c" + ".txt";
+	var fileName = "app/public/publicCodes/" + obj.fileName + "_" + t +"_c" + ".txt";
 	fs.writeFile(fileName, encrypted,  function(err) {
 		if (err) {
 		   return console.error(err);
@@ -298,6 +341,7 @@ exports.shareCode = function (req, res){
 		query['iv'] = initializationVector.toString('base64');
 		query['sharedSecret'] = sharedSecret.toString('base64');
 		query['filePath'] = fileName;
+		query['savedName'] = obj.fileName;
 		query['language'] = obj.language;
 		query['date'] = new Date();	
 
@@ -334,7 +378,7 @@ exports.shareCode = function (req, res){
 			function insertAgain(){
 				console.log("Inside insertAgain()");
 				console.log("before");
-				var fileName = "app/public/js/files/" + obj.id + "_" + t  +"_c" + ".txt";
+				var fileName = "app/public/js/files/" + obj.fileName + "_" + t  +"_c" + ".txt";
 				fs.writeFile(fileName, plaintext,  function(err) {
 					if (err) {
 					   return console.error(err);
@@ -417,7 +461,7 @@ exports.getPublic = function (req, res){
 										else
 											inside += "{\"name\":\"" + doc['fname'] + "" + doc['lname']+ "\"";
 
-										inside += ",\"fileName\":\"" + filePath.substr(1, filePath.length - 5) + "\"";
+										inside += ",\"fileName\":\"" + doc['savedName'] + "\"";
 										inside += ",\"language\":\"c\"";
 										inside += ",\"date\":\"" + doc['date'] + "\"";
 										inside += ",\"content\":\"" + content.toString("base64") + "\"},";
@@ -454,3 +498,34 @@ exports.getPublic = function (req, res){
 		});
 }
 
+exports.runCode = function (req, res){
+
+	var param = req.body.params;
+
+	var obj = JSON.parse(param);
+
+	var code = new Buffer(obj.data, 'base64');
+
+	console.log("flag: " + obj.flag);
+	var f = parseInt(obj.flag);
+	if(f){
+		console.log("Inside f1");
+		console.log(obj.values);
+	var envData = { OS : "linux" , cmd : "gcc" }; // ( uses gcc command to compile ) 
+	    compiler.compileCPPWithInput(envData , code , obj.values, function (data) {
+	        res.send(data);
+	        //data.error = error message  
+	        //data.output = output value 
+	    });
+
+	}else{
+	var envData = { OS : "linux" , cmd : "gcc" }; // ( uses gcc command to compile ) 
+	    compiler.compileCPP(envData , code , function (data) {
+	        res.send(data);
+	        //data.error = error message  
+	        //data.output = output value 
+	    });
+
+
+	}
+}
